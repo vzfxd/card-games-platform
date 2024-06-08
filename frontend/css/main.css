@@ -36,10 +36,6 @@ html, body {
     height: 100%;
     width: 100%;
     background-color: red;
-    text-wrap: wrap;
-}
-
-ul{
-    text-wrap: wrap;
+    overflow-y: auto;
 }
 

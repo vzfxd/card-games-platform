@@ -1,5 +1,7 @@
 package games.card.backend.configuration;
 
+import games.card.backend.filter.CreateGameFilter;
+import games.card.backend.filter.JwtAuthFilter;
 import games.card.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +18,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -28,19 +29,21 @@ public class WebSecurityConfiguration {
 
     private final UserRepository repository;
     private final JwtAuthFilter jwtAuthFilter;
+    private final CreateGameFilter createGameFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("api/auth/**").permitAll();
+                    auth.requestMatchers("/api/auth/**").permitAll();
                     auth.requestMatchers("/websocket/**").hasAuthority("USER");
                     auth.requestMatchers("/api/room/**").hasAuthority("USER");
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(createGameFilter, JwtAuthFilter.class);
 
         return http.build();
     }

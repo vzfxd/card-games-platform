@@ -8,10 +8,12 @@ import games.card.backend.repository.RoomRepository;
 import games.card.backend.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,26 +27,17 @@ public class RoomController {
     private final RoomRepository roomRepository;
 
     @GetMapping("/list")
-    public Response<List<RoomInfo>> roomList(){
-        Response<List<RoomInfo>> response = new Response<>();
-        response.setStatus(HttpStatus.OK);
-        response.setInfo(RoomInfo.convert(roomRepository.findAll()));
-        return response;
+    public ResponseEntity<List<RoomInfo>> roomList(){
+        return ResponseEntity.ok(RoomInfo.convert(roomRepository.findAll()));
     }
 
     @GetMapping("/info/{id}")
-    public Response<RoomInfo> roomInfo(@PathVariable Long id){
-        Response<RoomInfo> response = new Response<>();
-        response.setStatus(HttpStatus.OK);
-        return roomService.getInfo(id, response);
+    public ResponseEntity<RoomInfo> roomInfo(@PathVariable Long id){
+        return ResponseEntity.ok(roomService.getInfo(id));
     }
 
     @PostMapping("/create")
-    public Response<String> roomCreate(@AuthenticationPrincipal Jwt jwt, @RequestBody CreateRoomRequest request){
-        Response<String> response = new Response<>();
-        response.setStatus(HttpStatus.OK);
-        return roomService.create(jwt, request, response);
+    public ResponseEntity<Long> roomCreate(JwtAuthenticationToken jwt, @RequestBody CreateRoomRequest request){
+        return ResponseEntity.ok(roomService.create(jwt.getToken(),request));
     }
-
-
 }

@@ -22,4 +22,8 @@ public class RoomEntity {
     private String winner;
     private boolean active;
 
+    public void addPlayer(UserEntity user){
+        players.add(user);
+    }
+
 }

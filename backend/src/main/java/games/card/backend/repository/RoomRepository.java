@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface RoomRepository extends JpaRepository<RoomEntity, Long> {
     Optional<RoomEntity> findByPlayersContainsAndActiveTrue(UserEntity user);
+    Optional<RoomEntity> findByPlayersContains(UserEntity user);
 }

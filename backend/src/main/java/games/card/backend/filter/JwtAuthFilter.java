@@ -1,4 +1,4 @@
-package games.card.backend.configuration;
+package games.card.backend.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -31,7 +31,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader("Authorization");
         String queryToken = request.getParameter("Authorization");
-        System.out.println(queryToken);
 
         if (token != null && token.startsWith("Bearer ")) {
             jwtAuth(token.substring(7));
