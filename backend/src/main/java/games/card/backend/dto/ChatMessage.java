@@ -10,6 +10,6 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class ChatMessage {
-    private String jwt;
+    private String username;
     private String msg;
 }

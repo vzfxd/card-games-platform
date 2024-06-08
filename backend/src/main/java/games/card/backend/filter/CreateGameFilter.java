@@ -22,22 +22,18 @@ public class CreateGameFilter extends OncePerRequestFilter {
     private final RoomService roomService;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        System.out.println("create filter 1");
-        System.out.println(request.getRequestURI());
         if(request.getRequestURI().equals("/api/room/create")){
-            System.out.println("create filter 2");
             String token = request.getHeader("Authorization");
             if (token != null && token.startsWith("Bearer ")) {
-                System.out.println("create filter 3");
                 String jwt = token.substring(7);
                 Optional<RoomEntity> playerRoom = roomService.findPlayerRoom(jwt);
-                System.out.println(playerRoom.toString());
                 if(playerRoom.isPresent()){
-                    System.out.println("create filter 4");
+                    System.out.println("Player already in game");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.getWriter().write("Player already in game");
                     return;
                 }
+                System.out.println("Mozna stworzyc gre");
             }
         }
 

@@ -25,7 +25,7 @@ public class UserEntity implements UserDetails {
     @Column(unique=true)
     private String username;
     private String password;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<AuthorityEntity> authorities;
 
     public void addAuthority(AuthorityEntity authority){

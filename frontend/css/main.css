@@ -7,12 +7,15 @@ html, body {
 }
 
 .container {
-    width: 100%;
-    height: 100%;
     display: flex;
+    width: 100%;
+    height: 100vh; 
+}
+
+.index-container {
+    flex-direction: column;
     align-items:center;
     justify-content: space-evenly;
-    flex-direction: column;
 }
 
 .room {
@@ -25,17 +28,40 @@ html, body {
     width: 80%;
 }
 
-.chat-container{
-    height: 20%;
-    width: 20vw;
+.game-container {
+    flex-direction: row;
+}
+.table-container {
+    flex: 8;
+}
+.chat-container {
+    flex:2;
+    max-width: 20%;
+    background-color: lightgray;
     display: flex;
     flex-direction: column;
+    background: rgb(88, 88, 133);
 }
 
-.chat{
-    height: 100%;
-    width: 100%;
-    background-color: red;
+.chat {
     overflow-y: auto;
+    box-sizing: border-box;
+    height: 100%;
+}
+
+.chat-input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.chat ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.chat li {
+    margin-bottom: 1em;
+    word-wrap: break-word; /* lub overflow-wrap: break-word; */
 }
 

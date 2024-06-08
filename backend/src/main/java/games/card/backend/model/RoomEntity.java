@@ -26,4 +26,8 @@ public class RoomEntity {
         players.add(user);
     }
 
+    public void removePlayer(Long id) {
+        players.removeIf(u -> u.getId().equals(id));
+    }
+
 }

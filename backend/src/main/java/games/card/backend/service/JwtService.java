@@ -49,4 +49,9 @@ public class JwtService {
     public String getUsername(String jwt){
         return jwtDecoder.decode(jwt).getSubject();
     }
+
+    public String getUsername(URI uri){
+        String jwt = getJwtFromUri(uri);
+        return jwtDecoder.decode(jwt).getSubject();
+    }
 }

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -55,5 +56,23 @@ public class RoomService {
     public void addPlayerToRoom(RoomEntity room, String username){
         room.addPlayer(userRepository.findByUsername(username).orElseThrow());
         roomRepository.save(room);
+    }
+
+    public void removePlayerFromRoom(RoomEntity room, String username){
+        UserEntity user = userRepository.findByUsername(username).orElseThrow();
+        room.removePlayer(user.getId());
+        roomRepository.save(room);
+        deleteRoomIfNeeded(room);
+    }
+
+    public void deleteRoomIfNeeded(RoomEntity room){
+        if(room.isActive() && room.getPlayers().size() == 0){
+            roomRepository.delete(room);
+        }
+    }
+
+    public void deleteAllEmpty(){
+        List<RoomEntity> list = roomRepository.findAllByPlayersEmpty().orElseThrow();
+        roomRepository.deleteAll(list);
     }
 }

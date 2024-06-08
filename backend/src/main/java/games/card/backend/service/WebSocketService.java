@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.StandardSocketOptions;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Objects;
@@ -22,7 +23,7 @@ public class WebSocketService {
     private final RoomService roomService;
     private final RoomRepository roomRepository;
 
-    private String getEndpointAfter(URI uri, String after){
+    public String getEndpointAfter(URI uri, String after){
         String path = uri.getPath();
         int pos = path.indexOf(after);
         String afterWebSocket = path.substring(pos + after.length());
@@ -35,7 +36,7 @@ public class WebSocketService {
         return Long.parseLong(split[split.length-1]);
     }
 
-    private String readPayload(String payload, int line) throws IOException {
+    public String readPayload(String payload, int line) throws IOException {
         BufferedReader reader = new BufferedReader(new StringReader(payload));
         String read = "";
         for(int i=0; i<line; i++){
@@ -44,28 +45,28 @@ public class WebSocketService {
         return read;
     }
 
-    public boolean isAllowedToSend(URI uri, String payload) throws IOException, URISyntaxException {
-        if(!Objects.equals(readPayload(payload,1), "SEND")){
-            return true;
+    public boolean isAllowedToMessage(URI uri, String payload) throws IOException, URISyntaxException {
+        int line = 2;
+        if(Objects.equals(readPayload(payload,1), "SUBSCRIBE")){
+            line += 1;
         }
-        String dest = readPayload(payload,2);
+
+        String dest = readPayload(payload,line);
         Long sendId = getEndpointId(new URI(dest));
         Long connectedId = getEndpointId(uri);
         return sendId.equals(connectedId);
     }
 
-    public boolean isAllowedToConnect(URI uri, String payload) throws IOException {
-        if(!Objects.equals(readPayload(payload,1), "CONNECT")){
-            return true;
-        }
-
+    public boolean isAllowedToConnect(URI uri) {
         String webSocketType = getEndpointAfter(uri,"/websocket/");
         String jwt = jwtService.getJwtFromUri(uri);
         Optional<RoomEntity> playerRoom = roomService.findPlayerRoom(jwt);
         Optional<RoomEntity> connectingRoom = roomRepository.findById(getEndpointId(uri));
 
         if(webSocketType.equals("game")){
-            return playerRoom.isEmpty() && connectingRoom.isPresent();
+
+            return playerRoom.isEmpty() && connectingRoom.isPresent()
+                    && connectingRoom.get().getPlayers().size() != connectingRoom.get().getPlayerLimit();
         }
 
         if(webSocketType.equals("chat") && playerRoom.isPresent()){
