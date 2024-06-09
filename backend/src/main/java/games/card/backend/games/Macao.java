@@ -1,18 +1,32 @@
 package games.card.backend.games;
 
-public class Macao extends BaseGame{
-    @Override
-    public boolean isLegalMove(Card c) {
-        Card top =  this.cardStack.peek();
-        return top.getSuit() == c.getSuit() || top.getValue() == c.getValue();
+public class Macao extends Game{
+    public Macao(Long id, String owner) {
+        super(id,owner);
     }
 
     @Override
-    public void dealCards() {
-        for(int i = 0; i < 5; i++){
-            for(Player player: this.players){
-                getCardFromDeck(player);
-            }
-        }
+    public void nextTurn() {
+
+    }
+
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+
+    @Override
+    public void start() {
+
+    }
+
+    @Override
+    public Game getState(Player player) {
+        return null;
+    }
+
+    @Override
+    public String findWinner() {
+        return null;
     }
 }

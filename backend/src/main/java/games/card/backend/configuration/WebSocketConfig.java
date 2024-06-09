@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -76,15 +77,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 
             @Override
             public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-                if(Objects.equals(webSocketService.readPayload((String) message.getPayload(),1), "CONNECT")){
-                    super.handleMessage(session,message);
-                    return;
-                }
-
-                URI uri =  session.getUri();
-                if(!webSocketService.isAllowedToMessage(uri,(String) message.getPayload())){
-                    return;
-                }
+//                if(Objects.equals(webSocketService.readPayload((String) message.getPayload(),1), "CONNECT")){
+//                    super.handleMessage(session,message);
+//                    return;
+//                }
+//
+//                URI uri =  session.getUri();
+//                if(!webSocketService.isAllowedToMessage(uri,(String) message.getPayload())){
+//                    return;
+//                }
 
                 super.handleMessage(session,message);
             }

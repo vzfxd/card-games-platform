@@ -37,7 +37,7 @@ public class GameWebSocketHandlerDecorator extends WebSocketHandlerDecorator {
         }
         Optional<RoomEntity> connectingRoom = roomRepository.findById(webSocketService.getEndpointId(uri));
         String jwt = jwtService.getJwtFromUri(uri);
-        roomService.addPlayerToRoom(connectingRoom.get(),jwtService.getUsername(jwt));
+        roomService.addPlayerToRoom(connectingRoom.get(),jwtService.getUsername(jwt),session);
         super.afterConnectionEstablished(session);
     }
 
@@ -45,7 +45,7 @@ public class GameWebSocketHandlerDecorator extends WebSocketHandlerDecorator {
     public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus status) throws Exception {
         URI uri = session.getUri();
         Optional<RoomEntity> connectingRoom = roomRepository.findById(webSocketService.getEndpointId(uri));
-        roomService.removePlayerFromRoom(connectingRoom.get(),jwtService.getUsername(uri));
+        connectingRoom.ifPresent(room -> roomService.removePlayerFromRoom(room, jwtService.getUsername(uri)));
         super.afterConnectionClosed(session,status);
     }
 }

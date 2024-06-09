@@ -65,7 +65,7 @@ public class WebSocketService {
 
         if(webSocketType.equals("game")){
 
-            return playerRoom.isEmpty() && connectingRoom.isPresent()
+            return playerRoom.isEmpty() && connectingRoom.isPresent() && connectingRoom.get().isActive()
                     && connectingRoom.get().getPlayers().size() != connectingRoom.get().getPlayerLimit();
         }
 

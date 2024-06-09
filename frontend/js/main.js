@@ -40,6 +40,8 @@ const ul = document.querySelector('ul');
 const stompGameClient = new StompJs.Client({brokerURL:websocket_game_url});
 const stompChatClient = new StompJs.Client({brokerURL:websocket_chat_url});
 const chat = document.querySelector(".chat");
+const startButton = document.querySelector(".start-button");
+const winner = document.querySelector(".winner");
 let connected_id;
 let join_buttons;
 
@@ -114,25 +116,78 @@ function connectWebSocket(roomId, stompClient){
     stompClient.activate();
 }
 
-
 async function loadWebsite(){
+    winner.style.display = "none";
     game_container.style.display =  "none";
     getRoomList().then((res) => renderRoomList(res))
     .then(() => join_buttons.forEach(btn => {btn.addEventListener("click",(e) => joinClickHandler(e))}));
 }
 
-stompGameClient.onConnect = () => {
+function removeAllChildren(parentElement) {
+    while (parentElement.firstChild) {
+        parentElement.removeChild(parentElement.firstChild);
+    }
+}
+
+function renderPlayers(json, players) {
+    const parentDiv = document.querySelector('.table-container');
+    removeAllChildren(parentDiv);
+    let h = 100/players.length;
+
+    players.forEach(player => {
+        const playerDiv = document.createElement('div');
+        playerDiv.classList.add(player.username);
+        playerDiv.style.height = h+"%";
+        player.cards.forEach(card => {
+            const cardImg = document.createElement('img');
+            const cardFile = card.value.toLowerCase() + "_of_" + card.suit.toLowerCase() + ".png";
+            cardImg.style.height = "100%";
+            cardImg.src = `../png/${cardFile}`;
+            playerDiv.appendChild(cardImg);
+            
+        });
+        parentDiv.appendChild(playerDiv);
+    });
+
+    const playerDiv = document.querySelector("."+jwt_json['sub']);
+    if(json.deck != null){
+        const cardImg = document.createElement('img');
+        const cardFile = "blank_of_back.png";
+        cardImg.src = `../png/${cardFile}`;
+        cardImg.style.height = "100%";
+        playerDiv.appendChild(cardImg);
+        cardImg.addEventListener("click",()=>stompChatClient.publish({
+            destination: "/app/game/move/"+connected_id,
+            body: JSON.stringify({gameMove:"DRAW"})
+        }));
+    }
+    parentDiv.appendChild(playerDiv);
+}
+
+stompGameClient.onConnect = (res) => {
+    console.log(res)
     index_container.style.display= "none";
     game_container.style.display =  "flex";
     console.log("GAME CONNECTED");
     connectWebSocket(connected_id,stompChatClient);
 
-    stompGameClient.subscribe('/subscribe/game/'+connected_id, (msg) => {
-        console.log(msg)
+    stompGameClient.subscribe('/subscribe/game/'+jwt_json['sub'], (res) => {
+        json = JSON.parse(res.body);
+        console.log(json)
+        renderPlayers(json,json.players);
+
+        if(json.cardsOnTable != null){
+
+        }
+
+        if(json.winner != null){
+            winner.style.display = "block";
+            winner.innerHTML = json.winner;
+        }
     });
 }
 
-stompChatClient.onConnect = () => {
+stompChatClient.onConnect = (res) => {
     console.log("CHAT CONNECTED")
     stompChatClient.subscribe('/subscribe/chat/'+connected_id, (msg) => {
         let json = JSON.parse(msg.body);
@@ -141,6 +196,6 @@ stompChatClient.onConnect = () => {
 }
 
 create_room.addEventListener("click",() => createRoomHandler().then((res) => connectWebSocket(res,stompGameClient)));
-chat_input.addEventListener("keydown",(e) => sendMessage(e))
-
+chat_input.addEventListener("keydown",(e) => sendMessage(e));
+startButton.addEventListener("click",() => stompGameClient.publish({destination: "/app/game/start/"+connected_id,}));
 loadWebsite();
