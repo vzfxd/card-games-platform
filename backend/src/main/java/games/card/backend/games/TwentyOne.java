@@ -30,13 +30,14 @@ public class TwentyOne extends Game{
 
         List<Player> activePlayers = players.stream().filter(p->!p.isPass() || p.getUsername().equals(turn)).toList();
         if(activePlayers.isEmpty()) return;
+        System.out.println(activePlayers);
 
         int i = 0;
         for(Player player : activePlayers) {
-            i = (i+1) % players.size();
+            i = (i+1) % activePlayers.size();
             if(player.getUsername().equals(turn)) break;
         }
-        setTurn(players.get(i).getUsername());
+        setTurn(activePlayers.get(i).getUsername());
     }
 
     @Override
